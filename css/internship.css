@@ -1,0 +1,31 @@
+.overlay {
+  fill: none;
+  pointer-events: all;
+}
+
+.state {
+  fill: #aaa;
+}
+
+.county-border,
+.state-border {
+  fill: none;
+  stroke: #fff;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.intern-site {
+  fill-opacity: .3;
+  stroke: #fff;
+  stroke-width: 0;
+  fill: #2E64FE;
+}
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
