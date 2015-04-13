@@ -4,7 +4,7 @@
 }
 
 .state {
-  fill: #aaa;
+  fill: #D8D8D8;
 }
 
 .county-border,
@@ -16,10 +16,9 @@
 }
 
 .intern-site {
-  fill-opacity: .3;
+  fill-opacity: .4;
   stroke: #fff;
   stroke-width: 0;
-  fill: #2E64FE;
 }
 
 .axis path,
@@ -28,4 +27,62 @@
   stroke: #000;
   shape-rendering: crispEdges;
 }
+
+.bar-text {
+  font-family: "PT Sans" ;
+  fill: #848484;
+  font-size: 10pt;
+}
+
+label { 
+    padding:0.4em 2em 0.4em 0;
+    font-family: "PT Sans"; 
+}
+.toggle-btn-grp { 
+    margin:3px 0; 
+}
+.toggle-btn { 
+    text-align:centre; 
+    margin:5px 2px;
+    padding:0.4em 3em; 
+    color:#000; 
+    background-color:#FFF; 
+    border-radius:10px; 
+    display:inline-block; 
+    border:solid 1px #CCC; 
+    cursor:pointer;
+}
+
+.toggle-btn:hover { 
+    border:solid 1px #a0d5dc !important; 
+    background:#f1fdfe;
+}
+
+
+.toggle-btn.success { 
+    background:lightgreen;
+    border:solid 1px green !important; 
+}
+
+
+.visuallyhidden { 
+    border: 0; 
+    clip: rect(0 0 0 0); 
+    height: 1px; 
+    margin: -1px; 
+    overflow: hidden; 
+    padding: 0; 
+    position: absolute; 
+    width: 1px; 
+}
+.visuallyhidden.focusable:active, .visuallyhidden.focusable:focus { 
+    clip: auto; 
+    height: auto; 
+    margin: 0; 
+    overflow: visible; 
+    position: static; 
+    width: auto; 
+}
+
+
 
