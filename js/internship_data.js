@@ -14,6 +14,8 @@ function getMasterData() {
 }
 var masterData = $.parseJSON(getMasterData());
 
+
+
 function allData() {
 	var returnData = d3.nest()
 					 .key(function(d) { return d.location; })
@@ -38,6 +40,7 @@ function filterYear(year, industry) {
 		});
 	} else {
 		theData = $.grep(masterData, function(n, i) {
+			//$("industry-buffer").html("all industries");
 			return((n.year == year) && (n.industry == industry));
 		});
 	}
@@ -58,7 +61,6 @@ function filterYear(year, industry) {
 
 function filterIndustry(industry, year) {
 	var theData;
-
 	if((!year) || (year=='all years')) {
 		theData = $.grep(masterData, function(n, i) {
 			return(n.industry == industry)
@@ -82,6 +84,39 @@ function filterIndustry(industry, year) {
 					}).entries(theData);
 
 	return returnData;
+}
+
+function stateFilter(industry, year) {
+	var theData;
+	if((industry == "all industries") && (year == "all years")) {
+		theData = masterData;
+	} else if(industry != "all industries" && (year == "all years")) {
+		theData = $.grep(masterData, function(n, i) {
+			return(n.industry == industry)
+		});
+	} else if(industry == "all industries" && (year != "all years")) {
+		theData = $.grep(masterData, function(n, i) {
+			return(n.year == year)
+		});
+	} else if(industry != "all industries" && (year != "all years")) {
+		theData = $.grep(masterData, function(n, i) {
+			return((n.year == year) && (n.industry == industry));
+		});
+	}
+
+	returnData = d3.nest()
+					.key(function(d) { return d.location; })
+					.rollup(function(interns) {
+						return {
+							"location": interns.location,
+							"count": interns.length,
+							"coordinates": [d3.max(interns, function(g) { return parseFloat(g["lng"]); }), 
+						   					d3.max(interns, function(g) { return parseFloat(g["lat"]); })],
+							"medWage": d3.median(interns, function(d) { return parseFloat(d.wage) })
+						}
+					}).entries(theData);
+	return returnData;
+
 }
 
 
@@ -114,108 +149,27 @@ function barData(location, year) {
 	return returnData;
 }
 
-//sum number of internships for overall view
-function sumData(year) {
-	if(!year) {
-		var theData = d3.nest()
-					   .key(function(d) { return d.location; })
-					   .rollup(function(interns) {
-						   	return {
-						   		"location": interns.location,
-						   		"count": interns.length,
-						   		"coordinates": [d3.max(interns, function(g) { return parseFloat(g["lng"]); }), 
-						   						d3.max(interns, function(g) { return parseFloat(g["lat"]); })],
-						   		"medWage": d3.median(interns, function(d) { return parseFloat(d.wage) })
-						   	}
-					   }).entries(masterData);
-		return theData;
-	} else { 
-		var theData = d3.nest()
-					   .key(function(d) { return d.year; }).sortKeys(d3.ascending)
-					   .key(function(d) { return d.location; })
-					   .rollup(function(interns) {
-						   	return {
-						   		"location": interns.location,
-						   		"count": interns.length,
-						   		"coordinates": [d3.max(interns, function(g) { return parseFloat(g["lng"]); }), 
-						   						d3.max(interns, function(g) { return parseFloat(g["lat"]); })],
-						   		"medWage": d3.median(interns, function(d) { return parseFloat(d.wage) })
-						   	}
-					   }).entries(masterData);
-		return theData[year];
-	}
+function jah() {
 	
-}
+	returnData = d3.nest()
+					.key(function(d) { return d.industry })
+					.rollup(function(interns) {
+						return {
+							"count": interns.length,
+							"medWage": d3.median(interns, function(d) { return parseFloat(d.wage) })
+						}
+					}).entries(masterData);
 
-function industryData(location, year) {
-	var siteD = d3.nest()
-					 .key(function(d) { return d.year; }).sortKeys(d3.ascending)
-					 .key(function(d) { return d.location; })
-					 .key(function(d) { return d.industry; })
-					 .rollup(function(interns) {
-					 	return {
-					 		"location": interns.location,
-					 		"count": interns.length,
-					 		"medWage": d3.median(interns, function(d) { return parseFloat(d.wage) })
-					 	}
-					 }).entries(masterData);
-	return siteD;
-}
-
-function industryOverall(industry, year) {
-	var theData;
-
-	if(!year) {
-			theData = $.grep(masterData, function(n, i) {
-			return n.industry == industry;
-		});
-	} else {
-			theData = $.grep(masterData, function(n, i) {
-			return ((n.industry == industry) && (n.year == year));
-		});
+	returnData.sort(function(a, b) {
+		return a.count - b.count;
+	});
+	for(var i in returnData) {
+		var x = returnData[i].key;
+		console.log("<option value='" + x + "'>" + x + "</option>");
 	}
-	alert(theData);
-
-	theData = d3.nest()
-				.key(function(d) { return d.location; }).sortKeys(d3.ascending)
-				.rollup(function(interns) {
-					return {
-						"count": interns.length,
-						"medWage": d3.median(interns, function(d) { return parseFloat(d.wage) }),
-						"coordinates": [d3.max(interns, function(g) { return parseFloat(g["lng"]); }), 
-				   						d3.max(interns, function(g) { return parseFloat(g["lat"]); })]
-					}
-				}).entries(theData);
-	return theData;
 }
 
 
-function industryLocation(industry, location) {
-	var theData;
-
-	if(!location) {
-			theData = $.grep(masterData, function(n, i) {
-			return n.industry == industry;
-			});
-	} else {
-			theData = $.grep(masterData, function(n, i) {
-			return ((n.industry == industry) && (n.location == location));
-			});
-	}
-
-
-	theData = d3.nest()
-				.key(function(d) { return d.industry })
-				.rollup(function(interns) {
-					return {
-						"count": interns.length,
-						"medWage": d3.median(interns, function(d) { return parseFloat(d.wage) }),
-						"coordinates": [d3.max(interns, function(g) {return parseFloat(g['lng'])}),
-										d3.max(interns, function(g) {return parseFloat(g['lat'])})]
-					}
-				}).entries(theData);
-	return theData;
-}
 
 
 

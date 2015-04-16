@@ -1,3 +1,17 @@
+.background {
+  fill: none;
+  pointer-events: all;
+  stroke-width: 3;
+  stroke: #000;
+}
+
+.panel-background {
+  fill: none;
+  pointer-events: all;
+  stroke-width: 3;
+  stroke: #000;
+}
+
 .overlay {
   fill: none;
   pointer-events: all;
@@ -16,7 +30,7 @@
 }
 
 .intern-site {
-  fill-opacity: .4;
+  fill-opacity: .7;
   stroke: #fff;
   stroke-width: 0;
 }
@@ -28,15 +42,45 @@
   shape-rendering: crispEdges;
 }
 
+.industry-bar {
+  /*fill: #A3D1FF;*/
+}
+
+.industry-bar:hover {
+  fill: #0B2161;
+}
+
 .bar-text {
   font-family: "PT Sans" ;
   fill: #848484;
-  font-size: 10pt;
+  font-size: 9pt;
+}
+
+#industry-buffer {
+  display: none;
 }
 
 label { 
     padding:0.4em 2em 0.4em 0;
     font-family: "PT Sans"; 
+}
+
+fieldset {
+    font-family: sans-serif;
+    border: 2px solid #1F497D;
+    background: #F2F2F2;
+    border-radius: 5px;
+    padding: 15px;
+}
+
+fieldset legend {
+    background: #1F497D;
+    color: #fff;
+    padding: 5px 10px ;
+    font-size: 20px;
+    border-radius: 5px;
+    box-shadow: 0 0 0 5px #ddd;
+    margin-left: 20px;
 }
 .toggle-btn-grp { 
     margin:3px 0; 
@@ -44,24 +88,22 @@ label {
 .toggle-btn { 
     text-align:centre; 
     margin:5px 2px;
-    padding:0.4em 3em; 
-    color:#000; 
-    background-color:#FFF; 
+    padding:0.4em 1em; 
+    color:#424242; 
+    background-color:transparent; 
     border-radius:10px; 
     display:inline-block; 
-    border:solid 1px #CCC; 
     cursor:pointer;
 }
 
 .toggle-btn:hover { 
-    border:solid 1px #a0d5dc !important; 
-    background:#f1fdfe;
+    background:#A3D1FF;
+    color: #000;
 }
 
 
 .toggle-btn.success { 
-    background:lightgreen;
-    border:solid 1px green !important; 
+    background:#f39c12;
 }
 
 
@@ -84,5 +126,29 @@ label {
     width: auto; 
 }
 
+.styled-select select {
+   background: transparent;
+   width: 360px;
+   padding: 5px;
+   font-size: 16px;
+   line-height: 1;
+   border: 0;
+   border-radius: 0;
+   height: 36px;
+   /*-webkit-appearance: none;*/
+}
+
+.styled-select {
+   width: 360px;
+   height: 34px;
+   overflow: hidden;
+   background: #ddd;
+   border: 1px solid #ccc;
+}
+
+.filter-label {
+  font-size:22px;
+  padding: 0.4em 0.2em 0.4em 0;
+}
 
 

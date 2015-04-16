@@ -8,69 +8,140 @@
 	<script src="js/queue.v1.min.js"></script>
 	<script src="js/internship_data.js"></script>
 	<script src='js/jquery.tipsy.js'></script>
+	<link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
 	<link rel="stylesheet" type="text/css" href="css/internship.css">
 	<link rel="stylesheet" href="css/tipsy.css" type="text/css">
 <head>
 <body>
-	<div class="toggle-btn-grp">
-    <label onclick="projectPoints(allData())" class="toggle-btn"><input id="all-years" type="radio" name="years" value='all years'/>All</label>
-    <label onclick="projectPoints(filterYear('2011-12'))" class="toggle-btn"><input type="radio" name="years" value='2011-12'/>2011-12</label>
-    <label onclick="projectPoints(filterYear('2012-13'))" class="toggle-btn"><input type="radio" name="years" value='2012-13'/>2012-13</label>
-    <label onclick="projectPoints(filterYear('2013-14'))" class="toggle-btn"><input type="radio" name="years" value='2013-14'/>2013-14</label>
+	<div class="container">
+		<div class="row">
+			<div class="col-md-6">
+				<h2>UMSI Internships</h2>
+			</div>
+			<div class="col-md-10">
+				<p>
+					Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas venenatis, nisi sed tempor interdum, ipsum nisl vestibulum massa, nec faucibus nunc quam id urna. Morbi vitae enim cursus, porta metus vitae, dictum est. Cras ornare eget urna eget viverra. Pellentesque auctor nibh sit amet quam maximus, ac scelerisque lacus porta. Donec gravida hendrerit magna, non iaculis arcu posuere et. Sed pellentesque efficitur mi. Etiam sodales lobortis mauris, id pulvinar turpis sagittis ac. Vivamus varius tortor at mauris interdum, ornare efficitur dolor bibendum. Maecenas quis risus volutpat, dignissim turpis eget, sodales quam.
+				</p>
+			</div>
+		</div>
+		<fieldset>
+			<div class="row">
+				<div class="toggle-btn-grp">
+					<label class="filter-label">&nbsp;&nbsp;Year:</label>
+				    <label id="all-years-label" onclick="projectPoints(allData());$('#industry-buffer').html('all industries');$('#panel-svg').empty();" class="toggle-btn"><input id="all-years" type="radio" name="years" value='all years'/>All Years</label>
+				    <label onclick="projectPoints(filterYear('2011-12'));$('#industry-buffer').html('all industries');$('#panel-svg').empty();" class="toggle-btn"><input type="radio" name="years" value='2011-12'/>2011-12</label>
+				    <label onclick="projectPoints(filterYear('2012-13'));$('#industry-buffer').html('all industries');$('#panel-svg').empty();" class="toggle-btn"><input type="radio" name="years" value='2012-13'/>2012-13</label>
+				    <label onclick="projectPoints(filterYear('2013-14'));$('#industry-buffer').html('all industries');$('#panel-svg').empty();" class="toggle-btn"><input type="radio" name="years" value='2013-14'/>2013-14</label>
+				</div>
+			</div>
+			<div class="row">
+				<div class="toggle-btn-grp">
+					<label class="filter-label">&nbsp;&nbsp;View:</label>
+					<label id="map-view-label" onclick="" class="toggle-btn"><input id="map-view-radio" type="radio" name="view" value='map'/>Map</label>
+					<label id="compare-view-label" onclick="" class="toggle-btn"><input id="compare-view-radio" type="radio" name="view" value='compare'/>Compare</label>
+				</div>
+			</div>
+				<!--
+				<div class="toggle-btn-grp">
+					<label class="filter-label">Industry:</label>
+			    	<div class="styled-select">
+						<select>
+							<option value='All'>All</option>
+							<option value='Financial Services/Banking'>Financial Services/Banking</option>
+							<option value='K-12 School/Library'>K-12 School/Library</option>
+							<option value='Consulting'>Consulting</option>
+							<option value='Start-Up'>Start-Up</option>
+							<option value='Technology/Telecommunications'>Technology/Telecommunications</option>
+							<option value='Consumer Goods'>Consumer Goods</option>
+							<option value='Government/Government Library/Archives'>Government/Government Library/Archives</option>
+							<option value='Museum/Historical Society/Archives'>Museum/Historical Society/Archives</option>
+							<option value='Nonprofit'>Nonprofit</option>
+							<option value='Advertising/Interactive Design Agency'>Advertising/Interactive Design Agency</option>
+							<option value='Automotive/Transportation'>Automotive/Transportation</option>
+							<option value='University/College/Academic Library/Archives'>University/College/Academic Library/Archives</option>
+							<option value='Entertainment'>Entertainment</option>
+							<option value='Environmental/Natural Resources'>Environmental/Natural Resources</option>
+							<option value='Healthcare'>Healthcare</option>
+							<option value='Multimedia/Publishing'>Multimedia/Publishing</option>
+					  		<option value='Public Library'>Public Library</option>
+					  		<option value='Research'>Research</option>
+					  		<option value='Other'>Other</option>
+					  		<option value='Defense/Aerospace'>Defense/Aerospace</option>
+					  		<option value='Biotechnology/Pharmaceuticals'>Biotechnology/Pharmaceuticals</option>
+						</select>
+					</div>
+				</div>-->
+		</fieldset>
+		<p></p>
+		<div class="row">
+			<div id="map-div" class="col-md-6">
+			</div>
+			<div id="panel-div" class="col-md-5 col-md-offset-1">
+			</div>
+		</div>
+		
+
 	</div>
+	<br>
 	<script>
 
 		 $(function() {
    			$('a[rel=tipsy]').tipsy({fade: true, gravity: 'n'});
  		 });
 
-		var width = 800,
-			height = 600;
+		var width = 550,
+			height = 300;
+
 		var projection = d3.geo.albersUsa();
-		projection.scale([700]);
+
+		projection.scale([600]).translate([width / 2.4, height / 2.2]);
+
 		var path = d3.geo.path().projection(projection);
 
-		var x = d3.scale.linear()
-    			  .domain([0, width])
-    			  .range([0, width]);
+		function fadePath() {
 
-		var y = d3.scale.linear()
-    			  .domain([0, height])
-    			  .range([height, 0]);
+		}
 
-        
-		var svg = d3.select("body").append("svg")
+		var zoom = d3.behavior.zoom()
+    				.translate(projection.translate())
+    				.scale(projection.scale())
+    				.scaleExtent([height, 15*height])
+    				.on("zoom", zoomed);
+
+		var svg = d3.select("#map-div").append("svg")
 					.attr("width", width)
 					.attr("height", height)
-					.attr("id", "map-svg")
-					.append("g");
+					.attr("id", "map-svg");
 
-		var panel = d3.select("body").append("svg")
-					  .attr("width", width/2)
+
+		var panel = d3.select("#panel-div").append("svg")
+					  .attr("width", width/1.1)
 					  .attr("height", height)
 					  .attr("id", "panel-svg");
 
-		var features = svg.append("g");	
+
+		var features = svg.append("g").call(zoom);
+		
+		features.append("rect")
+    			.attr("class", "background")
+    			.attr("width", width)
+    			.attr("height", height);
 
 
-		bFill = d3.scale.linear()
-					   .domain([0, 59])
-					   .range([5, 255]);
+    	function zoomed() {
+		  projection.translate(d3.event.translate).scale(d3.event.scale);
 
-		rFill = d3.scale.linear()
-				   .domain([0,59])
-				   .range([255, 5]);
+		  features.selectAll("path").attr("d", path);
+		  var year = $('input[name="years"]:checked').val();
+		  var industry = $('#industry-buffer').html();
+		  projectPoints(stateFilter(industry, year));
+		}
 
-
-		/*svg.append("rect")
-    	   .attr("class", "overlay")
-           .attr("width", width)
-           .attr("height", height)
-           .call(zoom);*/
 
         var radius = d3.scale.sqrt()
-        			   .domain([1, 199])
-        			   .range([4, 10]);
+        			   .domain([1, 704])
+        			   .range([4, 30]);
+
 
         d3.json("js/us.json", function(error, us) {
   			if (error) return console.error(error);
@@ -88,10 +159,8 @@
 
 		});
 
-        //call data synchonously
-        //var yearOne = sumData();
 
-
+        //map points, takes a json
         function projectPoints(theData) {
 			$(".intern-site").remove();
 
@@ -103,39 +172,43 @@
       		           .attr("cx", function(d) { return projection(d.values.coordinates)[0]; })
       		           .attr("cy", function(d) { return projection(d.values.coordinates)[1]; })
       		           .attr("r", 1)
-      		           //.attr("r", function(d) { return radius(d.values.count); })
-      		           .style("fill", function(d) {return buildRGB(d.values.medWage);})
+      		           .style("fill", function(d) { return buildRGB(d.values.medWage); })
       		           .attr("onclick", function(d) { return "displayData('" + d.key + "')" })
       		           .attr("title", function(d) { return d.key })
       		           .transition()
       		           .attr("r", function(d) { return radius(d.values.count); })
       		           .duration(500);
 
+
+
       		$('svg circle').tipsy({ 
         	gravity: 's', 
         	html: true, 
         	title: function() {
-          		var d = this.__data__, site = d.key, wage = d.values.medWage, count = d.values.count;
+          		var d = this.__data__, site = d.key, wage = d.values.medWage.toFixed(2), count = d.values.count;
           		return '<span>' + site + '</span><br><span>Median Wage: ' + unpaid(wage) + '</spane><br><span>No. of internships: ' + count + "</span>"; 
         		},
       		});
 		}
 
+		//builds rgb color string
+		bFill = d3.scale.pow()
+					   .domain([0, 59])
+					   .range([10, 255]);
+
+		rFill = d3.scale.pow()
+				   .domain([0,59])
+				   .range([255, 10]);
+
 		function buildRGB(wage) {
         	var b = Math.floor(bFill(wage));
         	var r = Math.floor(rFill(wage));
-        	var g = Math.floor(rFill(wage));
+        	var g = 0;
         	var rgb = "rgb(" + r.toString() + "," + g.toString() + "," + b.toString() + ")";
         	return rgb;
         }
 
-		function transform(n) {
-			console.log(n);
-  			return "translate(" + x(n[0]) + "," + y(n[1]) + ")";
-		}
-
-
-
+		//fill bar panel with relevant data
 		function displayData(location) {
 
 
@@ -149,35 +222,38 @@
 			//console.log(JSON.stringify(theData))
 			var barX = d3.scale.linear()
 						  .domain([0, theData[0].values.count])
-						  .range([5, (width/4) - 70]);
+						  .range([5, (width/2.5) - 70]);
 
-			var barHeight = 30;
+			var barHeight = 20;
 
 			var bar = panel.selectAll("g")
 						   .data(theData)
 						   .enter().append("g")
-						   .attr("transform", function(d, i) { return "translate(0, " + i * barHeight + ")"; })
+						   .attr("transform", (function(d, i) { return "translate(0, " + i * barHeight + ")"; }))
 						   .attr("class", "industry");
 
 
 			rects = bar.append("rect")
 			   		   .attr("height", barHeight-5)
 			   		   .attr("width", 0)
-			   		   .attr("class", "industry")
+			   		   .attr("x", 0)
+			   		   .attr("class", "industry-bar")
+			   		   .style("fill", function(d) { return buildRGB(d.values.medWage); })
 			   		   .attr("onclick", function(d) {
 			   		   		var industry = d.key;
 			   		   		var year = $('input[name="years"]:checked').val();
-			   		   		var theString = "projectPoints(filterIndustry('" + industry + "','" + year + "'))";
-			   		   		return "console.log(" + theString + "); " + theString;
+			   		   		var theString = "projectPoints(filterIndustry('" + industry + "','" + year + "'));";
+			   		   		var theString2 = "$('#industry-buffer').html('" + d.key +"')"
+			   		   		return theString + theString2;
 			   		   })
 			   		   //.attr("x", function(d) { return (200 - barX(d.values.count))})
 			   		   .transition(500)
 			   		   .attr("width", function(d) { return barX(d.values.count) });
 
 			bar.append("text")
-			   .attr("y", 15)
+			   .attr("y", 12)
 			   .attr("class", "bar-text")
-			   .attr("x", function(d) { console.log(barX(d.values.count)); return (barX(d.values.count) + 2) })
+			   .attr("x", function(d) { return (barX(d.values.count) + 7) })
 			   .text(function(d) { return(d.key) });
 
 			
@@ -185,18 +261,17 @@
         	gravity: 'e', 
         	html: true, 
         	title: function() {
-          		var d = this.__data__, industry = d.key, wage = d.values.medWage, count = d.values.count;
+          		var d = this.__data__;
+          		var industry = d.key;
+          		var wage = d.values.medWage; 
+          		var count = d.values.count;
           		return '<span>Median Wage: ' + unpaid(wage) + '</spane><br><span>No. of internships: ' + count + "</span>"; 
         		},
       		});
-			/*panel.append("text")
-				 .attr("x", 0)
-				 .attr("y", 320)
-				 .text("Industry")
-				 .attr("fill", "gray")
-				 .attr("font-size", "20px");*/
 
 		}
+
+		//convert 0 wage to string 'unpaid'
 		function unpaid(theWage) {
 			if(parseFloat(theWage)<=0) {
 				return "unpaid";
@@ -204,34 +279,9 @@
 				return("$" + theWage + "/hr");
 			}
 		}; 
+
 		projectPoints(allData());
 
-
-
-
-		/*function changeYear(year) {
-			$(".intern-site").remove();
-			$("#panel-svg").empty();
-			var year = sumData(year);
-			var internSites = svg.selectAll(".intern-site")
-		      		   		   .data(year.values.sort(function(a) { return a.values.count; }))
-		      		           .enter()
-		      		           .append("circle")
-		      		           .attr("class", "intern-site")
-		      		           .attr("cx", function(d) { return projection(d.values.coordinates)[0]; })
-		      		           .attr("cy", function(d) { return projection(d.values.coordinates)[1]; })
-		      		           .attr("r", function(d) { return radius(d.values.count); })
-		      		           .attr("onclick", function(d) { return "displayData('" + d.key + "',0)" });
-
-		 }*/
-		/*$('svg circle').tipsy({ 
-        	gravity: 's', 
-        	html: true, 
-        	title: function() {
-          		var d = this.__data__, site = d.key, wage = d.values.medWage, count = d.values.count;
-          		return '<span>' + site + '</span><br><span>Median Wage: $' + wage + '/hr</spane><br><span>No. of internships: ' + count + "</span>"; 
-        	},
-      	});*/
 
       	$('.industry').tipsy({ 
         	gravity: 's', 
@@ -245,6 +295,7 @@
      
 
 	</script>
+	<p id="industry-buffer">all industries</p>
 	<script src="js/ui.js"></script>
 </body>
 </html>
