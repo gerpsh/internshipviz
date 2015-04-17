@@ -364,7 +364,7 @@
 		  		theData[i].radius = siteRadius(theData[i].values.count);
 		  		theData[i].color = buildRGB(theData[i].values.medWage);
 		  		theData[i].cx = 225 + (plusOrMinus() * 0.3 * i);
-		  		theData[i].cy = 150 + (plusOrMinus() * 0.3 * i);
+		  		theData[i].cy = 150 + (theData[i].values.medWage * 1.5 * -1);
 		  	}
 		  	console.log(theData);
 
