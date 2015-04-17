@@ -35,6 +35,10 @@
   stroke-width: 0;
 }
 
+.intern-site:hover {
+  fill-opacity: 1.0;
+}
+
 .axis path,
 .axis line {
   fill: none;
@@ -47,7 +51,7 @@
 }
 
 .industry-bar:hover {
-  fill: #0B2161;
+  fill-opacity: 0.5;
 }
 
 .bar-text {
