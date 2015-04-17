@@ -1,8 +1,4 @@
-/*
-	Gerald Shaeffer
-	SI649|InfoViz|Final Assignment
-
-*/
+/*A collection of data slicing functions*/
 
 //store master dataset to global; easier to handle this way than async
 function getMasterData() {

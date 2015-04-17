@@ -44,7 +44,7 @@
 					<label id="compare-view-label" onclick="compareView()" class="toggle-btn"><input id="compare-view-radio" type="radio" name="view" value='compare'/>Compare</label>
 				</div>
 			</div>
-				<!--
+				<!-- Ditched the drop-down box idea
 				<div class="toggle-btn-grp">
 					<label class="filter-label">Industry:</label>
 			    	<div class="styled-select">
@@ -91,7 +91,7 @@
 	</div>
 	<br>
 	<script>
-
+		 //tooltip snippet
 		 $(function() {
    			$('a[rel=tipsy]').tipsy({fade: true, gravity: 'n'});
  		 });
@@ -107,7 +107,8 @@
 
 		var path = d3.geo.path().projection(projection);
 
-		function colorScale(val) {
+		//these scales just won't return the right values, moved on to other things in the interest of time
+		/*function colorScale(val) {
 			if(val < 9.83) {
 				return "#E5F5F8";
 			} else if((val>=9.83) || (val<19.67)) {
@@ -121,7 +122,7 @@
 			} else {
 				return "#23343E";
 			}
-		}
+		}*/
 
 		/*colorScale = d3.scale.linear()
 						.range(["#23343E", "#48667F", "#6089AA", "#A9C5D8", "#BEE6EE", "#E5F5F8"])
@@ -143,20 +144,23 @@
 					.attr("id", "map-svg");
 
 
+		//histogram panel
 		var panel = d3.select("#panel-div").append("svg")
 					  .attr("width", width/1.1)
 					  .attr("height", height)
 					  .attr("id", "panel-svg");
 
-
+		//zoomable group
 		var features = svg.append("g").attr("class", "main-group").call(zoom);
 		
+		//required for zoom
 		features.append("rect")
     			.attr("class", "background")
     			.attr("width", width)
     			.attr("height", height);
 
 
+    	//zoom logic; instead of zooming on points, I just re-plot them every time a zoom occurs
     	function zoomed() {
 		  projection.translate(d3.event.translate).scale(d3.event.scale);
 
@@ -166,7 +170,7 @@
 		  projectPoints(stateFilter(industry, year));
 		}
 
-
+		//Only one to get even close to 30 is ann arbor, this is intentional
         var siteRadius = d3.scale.sqrt()
         			   .domain([1, 704])
         			   .range([4, 30]);
@@ -207,7 +211,7 @@
       		           .transition()
       		           .attr("r", function(d) { return siteRadius(d.values.count); })
       		           .duration(300);
-
+      		//tooltip
       		$('svg circle').tipsy({ 
         	gravity: 's', 
         	html: true, 
@@ -218,7 +222,7 @@
       		});
 		}
 
-		//builds rgb color string
+		//builds rgb color string for fills
 		bFill = d3.scale.linear()
 					   .domain([0, 59])
 					   .range([10, 255]);
@@ -275,6 +279,7 @@
 			   		   		var year = $('input[name="years"]:checked').val();
 			   		   		var view = $('input[name="view"]:checked').val();
 			   		   		var theString;
+			   		   		//act on main viz depending on context
 			   		   		if(view == "map") { 
 			   		   			theString = "mapView()"; 
 			   		   		} else { 
@@ -294,7 +299,7 @@
 			   .attr("x", function(d) { return (barX(d.values.count) + 7) })
 			   .text(function(d) { return(d.key) });
 
-			
+			//tooltip
 			$('svg rect').tipsy({
         	gravity: 'e', 
         	html: true, 
@@ -309,7 +314,7 @@
 
 		}
 
-		//convert 0 wage to string 'unpaid'
+		//convert 0 wage to string 'unpaid' for tooltip
 		function unpaid(theWage) {
 			if(parseFloat(theWage)<=0) {
 				return "unpaid";
@@ -318,7 +323,6 @@
 			}
 		}; 
 
-		//projectPoints(allData());
 
 
       	$('.industry').tipsy({ 
@@ -330,12 +334,14 @@
         	}
       	});
 
+      	//project map based on state
       	function mapView() {
       		var year = $('input[name="years"]:checked').val();
 		  	var industry = $('#industry-buffer').html();
 		  	projectPoints(stateFilter(industry, year));
       	}
 
+      	//handles year filter depending on state
       	function changeYear() {
       		var o = $('input[name="view"]:checked').val();
       		if(o == "compare") {
@@ -345,6 +351,7 @@
       		}
       	}
 
+      	//generates positive or negative 1
       	function plusOrMinus() {
       		var x = Math.random();
       		if(x<0.50) {
@@ -354,6 +361,7 @@
       		}
       	}
 
+      	//builds bubble cloud
      	function compareView() {
      		features.call(fake);
      		$("circle").remove();
@@ -363,29 +371,22 @@
 		  	var theData = stateFilter(industry, year);
 		  	theData.sort(function(a, b) { return b.values.count - a.values.count });
 
-
+		  	//add bubble-related object variables
 		  	for(var i in theData) {
 		  		theData[i].radius = siteRadius(theData[i].values.count);
 		  		theData[i].color = buildRGB(theData[i].values.medWage);
 		  		theData[i].cx = 225;// + (plusOrMinus() * 0.3 * i);
 		  		theData[i].cy = 150 + (theData[i].values.medWage * 1.5 * -1);
 		  	}
-		  	console.log(theData);
 
-     		var margin = {
-     			top: 0,
-     			right: 0,
-     			bottom: 0,
-     			left: 0
-     		}
+		  	//padding between bubble constituents
+     		var	padding = 2;
+     		var	radius = siteRadius;
 
-     		var n = 100,
-     			m = 1,
-     			padding = 2,
-     			radius = siteRadius;
-
+     		//declaring a "nodes" var has some interesting behavior...
      		var nodes = theData;
 
+     		//change node initial position from random to geographic location
      		for(i in nodes) {
      			nodes[i].x = projection(nodes[i].values.coordinates)[0];
      			nodes[i].y = projection(nodes[i].values.coordinates)[1];
@@ -413,13 +414,14 @@
 
 		  	function tick(e) {
 		  		//circle.each(gravity(function(d) { return d.radius * e.alpha }))
-		  		circle.each(function(d) { gravity(d.radius * e.alpha) })
-		  			  .each(gravity(0.7 * e.alpha))
+		  		//circle.each(function(d) { gravity(d.radius * e.alpha) })
+		  		circle.each(gravity(0.7 * e.alpha))
 		  			  .each(collide(0.5))
 		  			  .attr("cx", function(d) { return d.x })
 		  			  .attr("cy", function(d) { return d.y });
 		  	}
 
+		  	//set gravity strength
 		  	function gravity(alpha) {
 		  		return function(d) {
 		  			d.y += (d.cy - d.y) * alpha;
@@ -427,7 +429,7 @@
 		  		};
 		  	}
 
-
+		  	//deal with collisions, didn't get into the details here
 			function collide(alpha) {
 			    var quadtree = d3.geom.quadtree(nodes);
 			    return function (d) {
