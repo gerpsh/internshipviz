@@ -15,12 +15,15 @@
 <body>
 	<div class="container">
 		<div class="row">
+			<div class="col-md-1">
+				<img src="static/michigan.jpeg" style="height:60px; width:60px; position:absolute;">
+			</div>
 			<div class="col-md-6">
 				<h2>UMSI Internships</h2>
 			</div>
 			<div class="col-md-10">
 				<p>
-					Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas venenatis, nisi sed tempor interdum, ipsum nisl vestibulum massa, nec faucibus nunc quam id urna. Morbi vitae enim cursus, porta metus vitae, dictum est. Cras ornare eget urna eget viverra. Pellentesque auctor nibh sit amet quam maximus, ac scelerisque lacus porta. Donec gravida hendrerit magna, non iaculis arcu posuere et. Sed pellentesque efficitur mi. Etiam sodales lobortis mauris, id pulvinar turpis sagittis ac. Vivamus varius tortor at mauris interdum, ornare efficitur dolor bibendum. Maecenas quis risus volutpat, dignissim turpis eget, sodales quam.
+					This visualization illustrates internship data for UMSI master&#39;s students for the past 3 years. The circles on the map show the number of internships (size of the circle) and the median salary (color of the circle). The histogram bars show the median salary per industry. To make a better comparisons on the map, you can click on the &#34;compare&#34; view, where map fades out and all circles will get closer to each other. Circles that represent higher salary will be on top and circles represent lower salary will be on bottom. You can also filter the data in three ways 1) by Year: click a year button. 2) Location: click a circle. 3) Industry: click a bar.
 				</p>
 			</div>
 		</div>
@@ -28,16 +31,16 @@
 			<div class="row">
 				<div class="toggle-btn-grp">
 					<label class="filter-label">&nbsp;&nbsp;Year:</label>
-				    <label id="all-years-label" onclick="projectPoints(allData());$('#industry-buffer').html('all industries');$('#panel-svg').empty();" class="toggle-btn"><input id="all-years" type="radio" name="years" value='all years'/>All Years</label>
-				    <label onclick="projectPoints(filterYear('2011-12'));$('#industry-buffer').html('all industries');$('#panel-svg').empty();" class="toggle-btn"><input type="radio" name="years" value='2011-12'/>2011-12</label>
-				    <label onclick="projectPoints(filterYear('2012-13'));$('#industry-buffer').html('all industries');$('#panel-svg').empty();" class="toggle-btn"><input type="radio" name="years" value='2012-13'/>2012-13</label>
-				    <label onclick="projectPoints(filterYear('2013-14'));$('#industry-buffer').html('all industries');$('#panel-svg').empty();" class="toggle-btn"><input type="radio" name="years" value='2013-14'/>2013-14</label>
+				    <label id="all-years-label" onclick="changeYear();$('#industry-buffer').html('all industries');$('#panel-svg').empty();" class="toggle-btn"><input id="all-years" type="radio" name="years" value='all years'/>All Years</label>
+				    <label onclick="changeYear();" class="toggle-btn"><input type="radio" name="years" value='2011-12'/>2011-12</label>
+				    <label onclick="changeYear();" class="toggle-btn"><input type="radio" name="years" value='2012-13'/>2012-13</label>
+				    <label onclick="changeYear();" class="toggle-btn"><input type="radio" name="years" value='2013-14'/>2013-14</label>
 				</div>
 			</div>
 			<div class="row">
 				<div class="toggle-btn-grp">
 					<label class="filter-label">&nbsp;&nbsp;View:</label>
-					<label id="map-view-label" onclick="" class="toggle-btn"><input id="map-view-radio" type="radio" name="view" value='map'/>Map</label>
+					<label id="map-view-label" onclick="mapView()" class="toggle-btn"><input id="map-view-radio" type="radio" name="view" value='map'/>Map</label>
 					<label id="compare-view-label" onclick="compareView()" class="toggle-btn"><input id="compare-view-radio" type="radio" name="view" value='compare'/>Compare</label>
 				</div>
 			</div>
@@ -92,6 +95,7 @@
 		var width = 550,
 			height = 300;
 
+		var globalCircles;
 
 		var projection = d3.geo.albersUsa();
 
@@ -99,21 +103,34 @@
 
 		var path = d3.geo.path().projection(projection);
 
-		colorScale = d3.scale.linear()
+		function colorScale(val) {
+			if(val < 9.83) {
+				return "#E5F5F8";
+			} else if((val >= 9.83) || (val < 19.67)) {
+				return "#BEE6EE";
+			} else if((val >= 19.67) || (val < 29.5)) {
+				return "#A9C5D8";
+			} else if((val >=29.5) || (val < 39.33)) {
+				return "#6089AA";
+			} else if((val>=39.33) || (val < 49.17)) {
+				return "#48667F";
+			} else {
+				return "#23343E";
+			}
+		}
+
+		/*colorScale = d3.scale.linear()
 						.range(["#23343E", "#48667F", "#6089AA", "#A9C5D8", "#BEE6EE", "#E5F5F8"])
-        				.domain(d3.range(0, 59));
+        				.domain(d3.range(0, 59));*/
         				
 
+        var fake = d3.behavior.zoom()
 
-        console.log(colorScale(0));
-        console.log(colorScale(1));
-        console.log(colorScale(33));
-        console.log(colorScale(59));
 
 		var zoom = d3.behavior.zoom()
     				.translate(projection.translate())
     				.scale(projection.scale())
-    				.scaleExtent([height, 15*height])
+    				.scaleExtent([height, 20*height])
     				.on("zoom", zoomed);
 
 		var svg = d3.select("#map-div").append("svg")
@@ -128,7 +145,7 @@
 					  .attr("id", "panel-svg");
 
 
-		var features = svg.append("g").call(zoom);
+		var features = svg.append("g").attr("class", "main-group").call(zoom);
 		
 		features.append("rect")
     			.attr("class", "background")
@@ -146,7 +163,7 @@
 		}
 
 
-        var radius = d3.scale.sqrt()
+        var siteRadius = d3.scale.sqrt()
         			   .domain([1, 704])
         			   .range([4, 30]);
 
@@ -170,9 +187,9 @@
 
         //map points, takes a json
         function projectPoints(theData) {
-			$(".intern-site").remove();
-
-			var sites = svg.selectAll(".intern-site")
+			$("circle").remove();
+			features.call(zoom);
+			var sites = features.selectAll(".intern-site")
       		   		   .data(theData)
       		           .enter()
       		           .append("circle")
@@ -184,10 +201,8 @@
       		           .attr("onclick", function(d) { return "displayData('" + d.key + "')" })
       		           .attr("title", function(d) { return d.key })
       		           .transition()
-      		           .attr("r", function(d) { return radius(d.values.count); })
+      		           .attr("r", function(d) { return siteRadius(d.values.count); })
       		           .duration(300);
-
-
 
       		$('svg circle').tipsy({ 
         	gravity: 's', 
@@ -226,6 +241,7 @@
 			$("#panel-svg").empty();
 			theData = barData(location, $('input[name="years"]:checked').val());
 
+
 			theData.sort(function(a,b) {
 				return b.values.count - a.values.count;
 			});
@@ -253,9 +269,16 @@
 			   		   .attr("onclick", function(d) {
 			   		   		var industry = d.key;
 			   		   		var year = $('input[name="years"]:checked').val();
-			   		   		var theString = "projectPoints(filterIndustry('" + industry + "','" + year + "'));";
-			   		   		var theString2 = "$('#industry-buffer').html('" + d.key +"')"
-			   		   		return theString + theString2;
+			   		   		var view = $('input[name="view"]:checked').val();
+			   		   		var theString;
+			   		   		if(view == "map") { 
+			   		   			theString = "mapView()"; 
+			   		   		} else { 
+			   		   			theString = "compareView()"; 
+			   		   		}
+			   		   		//var theString = "projectPoints(filterIndustry('" + industry + "','" + year + "'));";
+			   		   		var theString2 = "$('#industry-buffer').html('" + d.key +"');"
+			   		   		return theString2 + theString;
 			   		   })
 			   		   //.attr("x", function(d) { return (200 - barX(d.values.count))})
 			   		   .transition(500)
@@ -303,38 +326,102 @@
         	}
       	});
 
-     	/*function compareView() {
-     		var padding = 6;
-     		var nodes = svg.selectAll(".intern-site").data();
-     		var force = d3.layout.force()
-					    .nodes(nodes)
-					    .size([width, height])
-					    .gravity(0)
-					    .charge(0)
-					    .on("tick", tick)
-					    .start();
+      	function mapView() {
+      		var year = $('input[name="years"]:checked').val();
+		  	var industry = $('#industry-buffer').html();
+		  	projectPoints(stateFilter(industry, year));
+      	}
+
+      	function changeYear() {
+      		var o = $('input[name="view"]:checked').val();
+      		if(o == "compare") {
+      			compareView();
+      		} else {
+      			mapView();
+      		}
+      	}
+
+      	function plusOrMinus() {
+      		var x = Math.random();
+      		if(x<0.50) {
+      			return -1;
+      		} else {
+      			return 1;
+      		}
+      	}
+
+     	function compareView() {
+     		features.call(fake);
+     		$("circle").remove();
+
+     		var year = $('input[name="years"]:checked').val();
+		  	var industry = $('#industry-buffer').html();
+		  	var theData = stateFilter(industry, year);
+		  	theData.sort(function(a, b) { return b.values.count - a.values.count });
 
 
-     		var circle = svg.selectAll(".intern-site").data(nodes)
-     		//console.log(JSON.stringify(nodes));
+		  	for(var i in theData) {
+		  		theData[i].radius = siteRadius(theData[i].values.count);
+		  		theData[i].color = buildRGB(theData[i].values.medWage);
+		  		theData[i].cx = 225 + (plusOrMinus() * 0.3 * i);
+		  		theData[i].cy = 150 + (plusOrMinus() * 0.3 * i);
+		  	}
+		  	console.log(theData);
 
-     		function tick(e) {
-			    circle.each(gravity(.2 * e.alpha))
-			        .each(collide(.5))
-			        .attr("cx", function (d) {
-			        return d.x;
-			    })
-			        .attr("cy", function (d) {
-			        return d.y;
-			    });
-			}
+     		var margin = {
+     			top: 0,
+     			right: 0,
+     			bottom: 0,
+     			left: 0
+     		}
 
-			function gravity(alpha) {
-			    return function (d) {
-			        d.y += (d.cy - d.y) * alpha;
-			        d.x += (d.cx - d.x) * alpha;
-			    };
-			}
+     		var n = 100,
+     			m = 1,
+     			padding = 2,
+     			radius = siteRadius;
+
+     		var nodes = theData;
+
+     		for(i in nodes) {
+     			nodes[i].x = projection(nodes[i].values.coordinates)[0];
+     			nodes[i].y = projection(nodes[i].values.coordinates)[1];
+     		}
+
+			
+		  	var force = d3.layout.force()
+		  						 .nodes(nodes)
+		  						 .size([width, height])
+		  						 .gravity(0)
+		  						 .charge(0)
+		  						 .on("tick", tick)
+		  						 .start();
+
+		  	var circle = features.selectAll("circle")
+		  					.data(nodes)
+		  					.enter().append("circle")
+		  					.attr("r", function(d) { return d.radius; })
+		  					.attr("cx", function(d) { return projection(d.values.coordinates)[0]; })
+      		           		.attr("cy", function(d) { return projection(d.values.coordinates)[1]; })
+      		           		.attr("onclick", function(d) { return "displayData('" + d.key + "')" })
+		  					.style("fill", function(d) { return d.color })
+		  					.call(force.drag);
+
+		  	function tick(e) {
+		  		//circle.each(gravity(function(d) { return d.radius * e.alpha }))
+		  		circle.each(function(d) { gravity(d.radius * e.alpha) })
+		  			  .each(gravity(.1 * e.alpha))
+		  			  .each(collide(.5))
+		  			  .attr("cx", function(d) { return d.x })
+		  			  .attr("cy", function(d) { return d.y });
+		  	}
+
+		  	function gravity(alpha) {
+		  		return function(d) {
+		  			d.y += (d.cy - d.y) * alpha;
+		  			d.x += (d.cx - d.x) * alpha;
+		  		};
+		  	}
+
 
 			function collide(alpha) {
 			    var quadtree = d3.geom.quadtree(nodes);
@@ -362,7 +449,16 @@
 			        });
 			    };
 			}
-     	}*/
+
+			$('svg circle').tipsy({ 
+        	gravity: 's', 
+        	html: true, 
+        	title: function() {
+          		var d = this.__data__, site = d.key, wage = d.values.medWage.toFixed(2), count = d.values.count;
+          		return '<span>' + site + '</span><br><span>Median Wage: ' + unpaid(wage) + '</spane><br><span>No. of internships: ' + count + "</span>"; 
+        		},
+      		});
+     	}
 
 
 

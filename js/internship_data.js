@@ -103,20 +103,21 @@ function stateFilter(industry, year) {
 			return((n.year == year) && (n.industry == industry));
 		});
 	}
-
+	x = d3.scale.ordinal().domain(d3.range(1)).rangePoints([0, 300], 1)
 	returnData = d3.nest()
 					.key(function(d) { return d.location; })
 					.rollup(function(interns) {
 						return {
-							"location": interns.location,
-							"count": interns.length,
-							"coordinates": [d3.max(interns, function(g) { return parseFloat(g["lng"]); }), 
+							location: interns.location,
+							count: interns.length,
+							coordinates: [d3.max(interns, function(g) { return parseFloat(g["lng"]); }), 
 						   					d3.max(interns, function(g) { return parseFloat(g["lat"]); })],
-							"medWage": d3.median(interns, function(d) { return parseFloat(d.wage) })
-						}
+							medWage: d3.median(interns, function(d) { return parseFloat(d.wage) }),
+							cx: x(Math.floor(Math.random())),
+							cy: 150
+						};
 					}).entries(theData);
 	return returnData;
-
 }
 
 
