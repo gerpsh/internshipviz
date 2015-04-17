@@ -35,6 +35,16 @@
   stroke-width: 0;
 }
 
+.bubble {
+  fill-opacity: 0.9;
+  stroke: #fff;
+  stroke-width: 0;
+}
+
+.bubble:hover {
+  fill-opacity: 0.75;
+}
+
 .intern-site:hover {
   fill-opacity: 1.0;
 }

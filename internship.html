@@ -82,7 +82,11 @@
 			<div id="panel-div" class="col-md-5 col-md-offset-1">
 			</div>
 		</div>
-		
+		<div class="row">
+			<div class="col-md-6">
+				<img src="static/1-06.png" style="height:86px; width:189px;">
+			</div>
+		<div>
 
 	</div>
 	<br>
@@ -99,20 +103,20 @@
 
 		var projection = d3.geo.albersUsa();
 
-		projection.scale([600]).translate([width / 2.4, height / 2.2]);
+		projection.scale([600]).translate([width / 2, height / 2]);
 
 		var path = d3.geo.path().projection(projection);
 
 		function colorScale(val) {
 			if(val < 9.83) {
 				return "#E5F5F8";
-			} else if((val >= 9.83) || (val < 19.67)) {
+			} else if((val>=9.83) || (val<19.67)) {
 				return "#BEE6EE";
-			} else if((val >= 19.67) || (val < 29.5)) {
+			} else if((val>=19.67) || (val<29.5)) {
 				return "#A9C5D8";
-			} else if((val >=29.5) || (val < 39.33)) {
+			} else if((val>=29.5) || (val<39.33)) {
 				return "#6089AA";
-			} else if((val>=39.33) || (val < 49.17)) {
+			} else if((val>=39.33) || (val<49.17)) {
 				return "#48667F";
 			} else {
 				return "#23343E";
@@ -215,11 +219,11 @@
 		}
 
 		//builds rgb color string
-		bFill = d3.scale.pow()
+		bFill = d3.scale.linear()
 					   .domain([0, 59])
 					   .range([10, 255]);
 
-		rFill = d3.scale.pow()
+		rFill = d3.scale.linear()
 				   .domain([0,59])
 				   .range([255, 10]);
 
@@ -363,7 +367,7 @@
 		  	for(var i in theData) {
 		  		theData[i].radius = siteRadius(theData[i].values.count);
 		  		theData[i].color = buildRGB(theData[i].values.medWage);
-		  		theData[i].cx = 225 + (plusOrMinus() * 0.3 * i);
+		  		theData[i].cx = 225;// + (plusOrMinus() * 0.3 * i);
 		  		theData[i].cy = 150 + (theData[i].values.medWage * 1.5 * -1);
 		  	}
 		  	console.log(theData);
@@ -399,6 +403,7 @@
 		  	var circle = features.selectAll("circle")
 		  					.data(nodes)
 		  					.enter().append("circle")
+		  					.attr("class", "bubble")
 		  					.attr("r", function(d) { return d.radius; })
 		  					.attr("cx", function(d) { return projection(d.values.coordinates)[0]; })
       		           		.attr("cy", function(d) { return projection(d.values.coordinates)[1]; })
@@ -409,8 +414,8 @@
 		  	function tick(e) {
 		  		//circle.each(gravity(function(d) { return d.radius * e.alpha }))
 		  		circle.each(function(d) { gravity(d.radius * e.alpha) })
-		  			  .each(gravity(.1 * e.alpha))
-		  			  .each(collide(.5))
+		  			  .each(gravity(0.7 * e.alpha))
+		  			  .each(collide(0.5))
 		  			  .attr("cx", function(d) { return d.x })
 		  			  .attr("cy", function(d) { return d.y });
 		  	}
